@@ -1,0 +1,526 @@
+/* Reset basic default styles and improve pixel look */
+* {
+    margin: 0;                           /* Remove default margin */
+    padding: 0;                          /* Remove default padding */
+    box-sizing: border-box;             /* Includes padding and border in element's total width/height */
+    user-select: none;                  /* Prevents text/image selection by user */
+    image-rendering: pixelated;         /* Makes images appear pixelated, suitable for retro games */
+}
+
+/* Style the body to center the game and apply a grid background */
+body {
+    display: flex;                      /* Use Flexbox layout */
+    justify-content: center;           /* Center horizontally */
+    align-items: center;               /* Center vertically */
+    height: 100vh;                     /* Full viewport height */
+    background-color: #1a1a1a;         /* Dark background color */
+    background-image: 
+        linear-gradient(#222 1px, transparent 1px),         /* Horizontal grid lines */
+        linear-gradient(90deg, #222 1px, transparent 1px);  /* Vertical grid lines */
+    background-size: 20px 20px;        /* Size of grid tiles */
+    font-family: 'Press Start 2P', cursive;  /* Retro-style pixel font */
+    margin: 0;                         /* Prevents body margin */
+    overflow: hidden;                 /* Prevents scrollbars */
+    color: #fff;                       /* White text color */
+}
+
+/* Main container for the game screen */
+#game-container {
+    position: relative;                /* Allows absolutely-positioned children */
+    width: 490px;                      /* Fixed width */
+    height: 550px;                     /* Fixed height */
+    background-color: #000;           /* Black background */
+    border: 8px solid #444;           /* Gray border around the container */
+    box-shadow:                       /* Multi-layered shadows for depth effect */
+        0 0 0 4px #333,
+        0 0 30px #000,
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+    overflow: hidden;                 /* Hide overflowing elements */
+}
+
+/* Grid area where the game takes place */
+#game-board {
+    display: grid;                     /* Use CSS Grid layout */
+    grid-template-columns: repeat(10, 48px);  /* 10 columns of 48px each */
+    grid-template-rows: repeat(10, 48px);     /* 10 rows of 48px each */
+    position: absolute;               /* Positioned within the game container */
+    top: 56px;                        /* Offset to make room for UI */
+    left: 0;                          /* Align to the left edge */
+}
+
+/* Default style for each cell in the grid */
+.cell {
+    width: 48px;                      /* Matches grid dimensions */
+    height: 48px;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.2);  /* Semi-transparent background */
+}
+
+/* Style for indestructible walls */
+.wall {
+    background-color: #3a3a3a;         /* Dark gray base color */
+    border: 
+        4px solid #4a4a4a,             /* Outer border */
+        inset 4px solid #2a2a2a;       /* Inset shadow border */
+    box-shadow: 
+        0 0 10px rgba(0, 0, 0, 0.5),   /* Outer shadow */
+        inset 0 0 15px rgba(0, 0, 0, 0.7);  /* Inner glow */
+}
+
+/* Style for destructible (breakable) blocks */
+.breakable {
+    background-color: #8B4513;         /* Brown color */
+    border: 
+        4px solid #A0522D,             /* Outer border in lighter brown */
+        inset 4px solid #6B3510;       /* Inset darker brown border */
+    box-shadow: 
+        0 0 5px rgba(0, 0, 0, 0.5),    /* Outer shadow */
+        inset 0 0 10px rgba(0, 0, 0, 0.7);  /* Inner glow */
+    animation: breakablePulse 2s infinite; /* Pulsing effect to indicate it's breakable */
+}
+
+/* Animation for pulsing breakable blocks */
+@keyframes breakablePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.98); opacity: 0.9; }
+}
+
+/* Player style: red circle with glow and animations */
+.player {
+    width: 32px;
+    height: 32px;
+    margin: 8px;
+    background-color: #FF3333;
+    border-radius: 50%;                /* Circular shape */
+    position: relative;
+    z-index: 10;                       /* Stays on top */
+    box-shadow: 
+        0 0 10px #FF0000,              /* Outer glow */
+        inset 0 0 10px rgba(255, 100, 100, 0.8);  /* Inner glow */
+    animation: 
+        pulse 0.8s infinite alternate,  /* Pulsing effect */
+        float 3s infinite ease-in-out;  /* Floating effect */
+}
+
+/* Pulse effect for the player */
+@keyframes pulse {
+    from { box-shadow: 0 0 10px #FF0000; }
+    to { box-shadow: 0 0 20px #FF5555; }
+}
+
+/* Enemy style: green circle with glow and float */
+.enemy {
+    width: 32px;
+    height: 32px;
+    margin: 8px;
+    background-color: #33FF33;
+    border-radius: 50%;
+    box-shadow: 
+        0 0 10px #00FF00,
+        inset 0 0 10px rgba(100, 255, 100, 0.8);
+    animation: 
+        enemyPulse 1.5s infinite alternate,
+        float 2s infinite ease-in-out;
+}
+
+/* Pulse animation for enemy color */
+@keyframes enemyPulse {
+    from { background-color: #33FF33; }
+    to { background-color: #55FF55; }
+}
+
+/* Bomb style: dark circle with label and animations */
+.bomb {
+    width: 32px;
+    height: 32px;
+    margin: 8px;
+    background-color: #222;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 
+        inset 0 0 15px #111,
+        0 0 0 4px #333;
+    animation: 
+        bombPulse 1s infinite alternate,
+        bombFloat 1.5s infinite ease-in-out;
+}
+
+/* Bomb grows slightly while pulsing */
+@keyframes bombPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+
+/* Vertical float for bomb */
+@keyframes bombFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Explosion effect: expanding and fading */
+.explosion {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 40px;
+    height: 40px;
+    background-color: #FF8C00;
+    border-radius: 4px;
+    opacity: 0.9;
+    z-index: 5;
+    box-shadow: 
+        0 0 10px #FFA500,
+        inset 0 0 15px #FF4500;
+    animation: 
+        explosionExpand 0.2s forwards,
+        fade 0.3s 0.2s forwards;
+}
+
+/* Explosion grows and appears */
+@keyframes explosionExpand {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 0.9; }
+}
+
+/* Power-up style: floating glowing item */
+.powerup {
+    width: 32px;
+    height: 32px;
+    margin: 8px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 
+        0 0 10px currentColor,
+        inset 0 0 10px rgba(255, 255, 255, 0.7);
+    animation: 
+        spin 3s infinite linear,
+        float 2s infinite ease-in-out;
+}
+
+/* Exit style: glowing yellow item */
+.exit {
+    background-color: #FFD700;
+    box-shadow: 
+        0 0 15px #FFD700,
+        inset 0 0 10px #FFA500;
+    animation: 
+        pulse 1.5s infinite alternate,
+        spin 5s infinite linear;
+}
+
+/* Top UI bar containing score, lives, etc. */
+#ui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 56px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-bottom: 4px solid #333;
+    z-index: 20;
+    font-size: 12px;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* Container for grouped UI elements */
+.ui-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Small circular icon inside UI */
+.ui-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+/* Score text highlight */
+#score-display {
+    color: #FFD700;
+}
+
+/* Full-screen overlay for start/game over screens */
+.game-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Semi-transparent black overlay */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    text-align: center;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* Show the game start screen using flexbox layout */
+#game-start {
+    display: flex;
+}
+
+/* Hide the game over and level complete screens by default */
+#game-over, #level-complete {
+    display: none;
+}
+
+/* Main title styling: large font, red color with layered shadows for depth, margin below, and floating animation */
+.title {
+    font-size: 36px;
+    color: #FF5555;
+    text-shadow: 
+        4px 4px 0 #FF0000,    /* bright red shadow offset */
+        8px 8px 0 #800000;    /* darker shadow for depth */
+    margin-bottom: 20px;
+    animation: titleFloat 3s infinite ease-in-out; /* smooth up/down float animation */
+}
+
+/* Animation keyframes for floating the title vertically */
+@keyframes titleFloat {
+    0%, 100% { transform: translateY(0); }    /* start and end at original position */
+    50% { transform: translateY(-10px); }     /* float up by 10px halfway through */
+}
+
+/* Subtitle styling: smaller font, grey color, and margin below */
+.subtitle {
+    font-size: 16px;
+    color: #AAA;
+    margin-bottom: 30px;
+}
+
+/* Button styling: red background, white text, no border, padding, pixel-style font, rounded corners, shadows for 3D effect, uppercase text */
+.btn {
+    background-color: #FF3333;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-family: 'Press Start 2P', cursive;  /* retro pixel font */
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 
+        0 5px 0 #800000,     /* dark red shadow below for depth */
+        0 0 10px #FF0000;    /* glow effect */
+    transition: all 0.1s;
+    text-transform: uppercase;
+}
+
+/* Button hover effect: lighter red background, slight downward movement, stronger glow */
+.btn:hover {
+    background-color: #FF5555;
+    transform: translateY(2px);
+    box-shadow: 
+        0 3px 0 #800000,
+        0 0 15px #FF0000;
+}
+
+/* Button active (pressed) effect: further downward movement, glow intensifies, shadow below removed */
+.btn:active {
+    transform: translateY(5px);
+    box-shadow: 
+        0 0px 0 #800000,
+        0 0 20px #FF0000;
+}
+
+/* Controls container styled as grid with two equal columns and gaps, smaller font */
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+/* Individual control item styled as flex row with centered alignment and spacing */
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Key representation style: dark background, white text, padding, rounded corners, subtle shadow */
+.key {
+    background-color: #333;
+    color: #FFF;
+    padding: 5px 10px;
+    border-radius: 4px;
+    box-shadow: 0 2px 0 #111;
+}
+
+/* Explosion particle styling: small orange circle, absolutely positioned, no pointer events, layered above other elements, animated movement and fading */
+.explosion-particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: #FFA500; /* orange */
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 15;
+    animation: 
+        particleMove 0.5s forwards,  /* move according to custom properties */
+        particleFade 0.5s forwards;  /* fade out */
+}
+
+/* Particle movement animation: translates by custom CSS variables --tx and --ty */
+@keyframes particleMove {
+    to { transform: translate(var(--tx), var(--ty)); }
+}
+
+/* Particle fading animation: fades opacity to 0 */
+@keyframes particleFade {
+    to { opacity: 0; }
+}
+
+/* Grass cell background with two radial gradients to simulate texture and pattern, repeated every 40x40px, partially transparent */
+.cell.grass {
+    background-image: 
+        radial-gradient(circle at 10px 10px, #2a5a2a 1px, transparent 2px),
+        radial-gradient(circle at 30px 20px, #2a5a2a 1px, transparent 2px);
+    background-size: 40px 40px;
+    opacity: 0.6;
+}
+
+/* Player shadow effect using ::after pseudo-element, positioned below player with blur and pulse animation */
+.player::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 10px;
+    width: 12px;
+    height: 4px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 50%;
+    animation: shadowPulse 0.8s infinite alternate;
+}
+
+/* Shadow pulse animation: scaling and changing opacity */
+@keyframes shadowPulse {
+    from { transform: scale(1); opacity: 0.3; }
+    to { transform: scale(1.2); opacity: 0.5; }
+}
+
+/* Bomb styling using ::before pseudo-element, small vertical stack of dark grey circles to simulate fuse or detail */
+.bomb::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 12px;
+    width: 4px;
+    height: 4px;
+    background-color: #555;
+    border-radius: 50%;
+    box-shadow: 
+        0 8px 0 #555,
+        0 16px 0 #555;
+}
+
+/* Enemy styling with ::after pseudo-element showing a blinking yellow question mark above */
+.enemy::after {
+    content: '?';
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    font-size: 12px;
+    color: #FF0;
+    text-shadow: 1px 1px 0 #000;
+    animation: blink 1s infinite;
+}
+
+/* Blink animation: visible half the time, invisible the other half */
+@keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+/* Top gradient overlay inside the game container for a fade effect, positioned above game content */
+#game-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: linear-gradient(to bottom, 
+        rgba(0, 0, 0, 0.8) 0%, 
+        transparent 100%);
+    z-index: 21;
+    pointer-events: none;
+}
+
+/* Bottom gradient overlay inside the game container for fade effect, positioned above game content */
+#game-container::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to top, 
+        rgba(0, 0, 0, 0.8) 0%, 
+        transparent 100%);
+    z-index: 21;
+    pointer-events: none;
+}
+
+/* Scanlines overlay: repeated subtle horizontal lines across the entire game area, animated to scroll vertically */
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(255, 255, 255, 0.05) 50%,
+            rgba(0, 0, 0, 0) 100%
+        );
+    background-size: 100% 4px;
+    z-index: 30;
+    pointer-events: none;
+    animation: scanline 8s linear infinite;
+}
+
+/* Scanline animation: moves the background vertically from top to bottom */
+@keyframes scanline {
+    from { background-position: 0 0; }
+    to { background-position: 0 100%; }
+}
+
+/* CRT effect overlay: radial vignette darkening and inner shadows for old monitor look */
+.crt-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at center, 
+            transparent 0%, 
+            rgba(0, 0, 0, 0.2) 100%);
+    box-shadow: 
+        inset 0 0 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 100px rgba(0, 0, 0, 0.3);
+    z-index: 31;
+    pointer-events: none;
+}
