@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<!-- Defines the document type as HTML5 -->
+
+<html>
+<head>
+    <!-- Sets the page title displayed in the browser tab -->
+    <title>Bomberman Ultra Retro</title>
+
+    <!-- Links to the external CSS stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- Imports a retro-style pixel font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Main container for the entire game interface -->
+    <div id="game-container">
+
+        <!-- UI section displaying player information (lives, score, etc.) -->
+        <div id="ui">
+
+            <!-- Displays number of lives -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #FF3333;"></div>
+                <span id="lives-display">3</span>
+            </div>
+
+            <!-- Displays player score -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #FFD700;"></div>
+                <span id="score-display">00000</span>
+            </div>
+
+            <!-- Displays current level -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #3333FF;"></div>
+                <span id="level-display">01</span>
+            </div>
+
+            <!-- Displays bomb count (current/max) -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #000;"></div>
+                <span id="bombs-display">1/1</span>
+            </div>
+
+            <!-- Displays current bomb explosion range -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #FFA500;"></div>
+                <span id="range-display">2</span>
+            </div>
+
+            <!-- Displays time left in the level -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #33FF33;"></div>
+                <span id="time-display">120</span>
+            </div>
+
+        </div>
+
+        <!-- Container for the game map/board -->
+        <div id="game-board"></div>
+
+        <!-- Game Start Screen -->
+        <div id="game-start" class="game-screen">
+            <h1 class="title">BOMBERKID</h1>
+            <p class="subtitle">RETRO EDITION</p>
+            <button class="btn" onclick="startGame()">START GAME</button>
+
+            <!-- Instructions showing control keys -->
+            <div class="controls">
+
+                <div class="control-item">
+                    <span class="key">w</span>
+                    <span>MOVE UP</span>
+                </div>
+
+                <div class="control-item">
+                    <span class="key">s</span>
+                    <span>MOVE DOWN</span>
+                </div>
+
+                <div class="control-item">
+                    <span class="key">a</span>
+                    <span>MOVE LEFT</span>
+                </div>
+
+                <div class="control-item">
+                    <span class="key">d</span>
+                    <span>MOVE RIGHT</span>
+                </div>
+
+                <div class="control-item">
+                    <span class="key">SPACE</span>
+                    <span>PLACE BOMB</span>
+                </div>
+
+                <div class="control-item">
+                    <span class="key">P</span>
+                    <span>PAUSE</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over" class="game-screen">
+            <h1 class="title">GAME OVER</h1>
+
+            <!-- Displays final score -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #FFD700;"></div>
+                <span id="final-score">00000</span>
+            </div>
+
+            <!-- Displays final level reached -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #33FF33;"></div>
+                <span id="final-level">01</span>
+            </div>
+
+            <!-- Button to restart the game -->
+            <button class="btn" onclick="resetGame()">PLAY AGAIN</button>
+        </div>
+
+        <!-- Level Complete Screen -->
+        <div id="level-complete" class="game-screen">
+            <h1 class="title">LEVEL CLEAR!</h1>
+            <p class="subtitle">PREPARING NEXT LEVEL...</p>
+
+            <!-- Displays bonus score for the level -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #FFD700;"></div>
+                <span id="level-score">+500</span>
+            </div>
+
+            <!-- Displays the next level number -->
+            <div class="ui-box">
+                <div class="ui-icon" style="background-color: #FF3333;"></div>
+                <span id="next-level">02</span>
+            </div>
+        </div>
+
+        <!-- Visual effects: scanlines for CRT aesthetic -->
+        <div class="scanlines"></div>
+        <div class="crt-effect"></div>
+
+    </div>
+
+    <!-- Background music that loops continuously -->
+    <audio id="bgMusic" loop>
+        <source src="assets/sounds/iron_man.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Sound effects for game interactions -->
+    <audio id="bombSound">
+        <source src="assets/sounds/bomb.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="explosionSound">
+        <source src="assets/sounds/explosion.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="powerupSound">
+        <source src="assets/sounds/upgrade.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="gameOverSound">
+        <source src="assets/sounds/gameOver.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="levelCompleteSound">
+        <source src="assets/sounds/victory.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- JavaScript files controlling game logic and interface -->
+    <script src="js/config.js"></script>
+    <script src="js/gameState.js"></script>
+    <script src="js/domElements.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/bombs.js"></script>
+    <script src="js/powerups.js"></script>
+    <script src="js/init.js"></script>
+    <script src="js/gameLoop.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>
